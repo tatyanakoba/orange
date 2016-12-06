@@ -81,4 +81,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     s.args = ["-a"]
   end
 
+  config.vm.provision "shell" do |s|
+    s.path = "./init_env.sh"
 end
