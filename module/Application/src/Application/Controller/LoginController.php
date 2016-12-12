@@ -14,7 +14,7 @@ use Zend\View\Model\ViewModel;
 
 class LoginController extends AbstractActionController
 {
-    public function indexAction()
+    public function loginAction()
     {
         return new ViewModel();
     }
