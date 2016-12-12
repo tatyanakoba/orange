@@ -22,6 +22,16 @@ return array(
                     ),
                 ),
             ),
+            'login' => array(
+                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'options' => array(
+                    'route'    => '/login',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Login',
+                        'action'     => 'login',
+                    ),
+                ),
+            ),
             // The following is a route to simplify getting started creating
             // new controllers and actions without needing to create a new
             // module. Simply drop new controllers in, and you can access them
@@ -32,8 +42,8 @@ return array(
                     'route'    => '/application',
                     'defaults' => array(
                         '__NAMESPACE__' => 'Application\Controller',
-                        'controller'    => 'Index',
-                        'action'        => 'index',
+                        'controller'    => 'Index', 'Login',
+                        'action'        => 'index', 'login',
                     ),
                 ),
                 'may_terminate' => true,
@@ -75,7 +85,8 @@ return array(
     ),
     'controllers' => array(
         'invokables' => array(
-            'Application\Controller\Index' => Controller\IndexController::class
+            'Application\Controller\Index' => Controller\IndexController::class,
+            'Application\Controller\Login' => Controller\LoginController::class
         ),
     ),
     'view_manager' => array(
@@ -85,8 +96,8 @@ return array(
         'not_found_template'       => 'error/404',
         'exception_template'       => 'error/index',
         'template_map' => array(
-            'layout/layout'           => __DIR__ . '/../view/layout/layout.phtml',
-            'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
+            'layout/layout'           => __DIR__ . '/../view/layout/layout.phtml', '/../view/layout/layout_login.phtml',
+            'application/index/index' => __DIR__ . '/../view/application/index/index.phtml', '/../view/application/login/login.phtml',
             'error/404'               => __DIR__ . '/../view/error/404.phtml',
             'error/index'             => __DIR__ . '/../view/error/index.phtml',
         ),
