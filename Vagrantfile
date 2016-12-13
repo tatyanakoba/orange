@@ -9,7 +9,7 @@ vm_hostname = "orange.local"
 hm_project_dir = "."
 
 box_name = "ubuntu/trusty64"
-vm_project_dir = "/orange"
+vm_project_dir = "/var/www/orange"
 
 
 VAGRANTFILE_API_VERSION = '2'
@@ -73,14 +73,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
   end
 
-  #config.vm.provision 'shell', inline: @script
-  
-  # Provisioning
-  config.vm.provision "shell" do |s|
-    s.path = "./install_5_4_dev_env.sh"
-    s.args = ["-a"]
-  end
-
   config.vm.provision "shell" do |s|
     s.path = "./init_env.sh"
+  end
+
+  #config.vm.provision 'shell', inline: @script
+
 end
