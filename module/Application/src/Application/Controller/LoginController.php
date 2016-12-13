@@ -16,6 +16,10 @@ class LoginController extends AbstractActionController
 {
     public function loginAction()
     {
-        return new ViewModel();
+        $view = new ViewModel();
+        $layout = $this->layout();
+        $layout->setTemplate('layout/layout_login');
+
+        return $view;
     }
 }
