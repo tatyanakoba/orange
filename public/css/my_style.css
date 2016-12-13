@@ -1,0 +1,19 @@
+#head {
+    font-family: serif;
+    text-align: center;
+}
+
+#form {
+    width: 50%;
+    margin-left: 25%;
+}
+
+#login {
+    width: 20%;
+    margin: auto;
+}
+
+#inputs {
+    width: 50%;
+    margin: auto;
+}

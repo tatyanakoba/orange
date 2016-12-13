@@ -1,3 +1,16 @@
 <div>
-    <h1><?php echo $this->translate('Ласкаво просимо до оранжерейки') ?></h1>
+    <h3 id="head"><?php echo $this->translate('Ласкаво просимо до оранжерейки') ?></h3>
+</div>
+<div id="form">
+    <form method="post">
+        <div id="inputs">
+            <label for="exampleInputName2"><?php echo $this->translate('Вкажіть свій логін') ?></label>
+            <input type="text" class="form-control" id="exampleInputName2">
+            <br>
+            <label for="exampleInputPassword3"><?php echo $this->translate('Вкажіть свій пароль') ?></label>
+            <input type="password" class="form-control" id="exampleInputPassword3">
+         </div>
+        <br>
+        <div id="login"><button type="submit" class="btn btn-primary">Зайти</button></div>
+    </form>
 </div>
