@@ -17,3 +17,19 @@
     width: 50%;
     margin: auto;
 }
+
+#header{
+    margin-top: 8%;
+    width: 100%;
+    text-align: center;
+}
+
+hr{
+    border-color: #0a520f;
+}
+
+body{
+    background-image: url('/img/fon.jpeg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
