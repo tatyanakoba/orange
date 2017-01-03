@@ -1,82 +1,55 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-vm_name = "orange.local"
-vm_memory = "1024"
-vm_cpus = "2"
-vm_hostname = "orange.local"
-
-hm_project_dir = "."
-
-box_name = "ubuntu/trusty64"
-vm_project_dir = "/var/www/orange"
-
-
 VAGRANTFILE_API_VERSION = '2'
 
 @script = <<SCRIPT
-DOCUMENT_ROOT_ZEND="/var/www/zf/public"
+# Fix for https://bugs.launchpad.net/ubuntu/+source/livecd-rootfs/+bug/1561250
+if ! grep -q "ubuntu-xenial" /etc/hosts; then
+    echo "127.0.0.1 ubuntu-xenial" >> /etc/hosts
+fi
+# Install dependencies
+add-apt-repository ppa:ondrej/php
 apt-get update
-apt-get install -y apache2 git curl php5-cli php5 php5-intl libapache2-mod-php5
-echo "
-<VirtualHost *:80>
-    ServerName skeleton-zf.local
-    DocumentRoot $DOCUMENT_ROOT_ZEND
-    <Directory $DOCUMENT_ROOT_ZEND>
-        DirectoryIndex index.php
-        AllowOverride All
-        Order allow,deny
-        Allow from all
-    </Directory>
-</VirtualHost>
-" > /etc/apache2/sites-available/skeleton-zf.conf
+apt-get install -y apache2 git curl php7.0 php7.0-bcmath php7.0-bz2 php7.0-cli php7.0-curl php7.0-intl php7.0-json php7.0-mbstring php7.0-opcache php7.0-soap php7.0-sqlite3 php7.0-xml php7.0-xsl php7.0-zip libapache2-mod-php7.0
+# Configure Apache
+echo "<VirtualHost *:80>
+	DocumentRoot /var/www/public
+	AllowEncodedSlashes On
+	<Directory /var/www/public>
+		Options +Indexes +FollowSymLinks
+		DirectoryIndex index.php index.html
+		Order allow,deny
+		Allow from all
+		AllowOverride All
+	</Directory>
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>" > /etc/apache2/sites-available/000-default.conf
 a2enmod rewrite
-a2dissite 000-default
-a2ensite skeleton-zf
 service apache2 restart
-cd /var/www/zf
-curl -Ss https://getcomposer.org/installer | php
-php composer.phar install --no-progress
-echo "** [ZEND] Visit http://localhost:8085 in your browser for to view the application **"
+if [ -e /usr/local/bin/composer ]; then
+    /usr/local/bin/composer self-update
+else
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+fi
+# Reset home directory of vagrant user
+if ! grep -q "cd /var/www" /home/ubuntu/.profile; then
+    echo "cd /var/www" >> /home/ubuntu/.profile
+fi
+echo "** [ZF] Run the following command to install dependencies, if you have not already:"
+echo "    vagrant ssh -c 'composer install'"
+echo "** [ZF] Visit http://localhost:8080 in your browser for to view the application **"
 SCRIPT
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-    config.vm.provider "virtualbox" do |v|
-       v.name = vm_name
-       v.memory = vm_memory
-       v.cpus = vm_cpus
-    end
+  config.vm.box = 'ubuntu/xenial64'
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.synced_folder '.', '/var/www'
+  config.vm.provision 'shell', inline: @script
 
-  # Vagrant box initialization
-  config.vm.box = box_name
-
-  # Networking and mounted dirs
-  config.vm.hostname = vm_hostname
-  config.vm.network 'private_network', type: 'dhcp'
-  config.vm.synced_folder hm_project_dir, vm_project_dir, owner: "www-data", group: "www-data"
-
-  # Hostmanager configuration
-  config.hostmanager.enabled = true
-  config.hostmanager.manage_host = true
-  config.hostmanager.manage_guest = false
-  config.hostmanager.ignore_private_ip = false
-  config.hostmanager.include_offline = true
-
-  # IP resolver
-  config.hostmanager.ip_resolver = proc do |vm|
-      result = ''
-      vm.communicate.execute("ip -f inet addr | egrep '^\s*inet\s+' | tail -n1 | awk -F' ' '{print $2}' | cut -d'/' -f1") do |type, data|
-          result << data if type == :stdout
-      end
-      unless result.empty?
-          result.split("\n").first
-      end
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "1024"]
+    vb.customize ["modifyvm", :id, "--name", "ZF Application - Ubuntu 16.04"]
   end
-
-  config.vm.provision "shell" do |s|
-    s.path = "./init_env.sh"
-  end
-
-  #config.vm.provision 'shell', inline: @script
-
 end
